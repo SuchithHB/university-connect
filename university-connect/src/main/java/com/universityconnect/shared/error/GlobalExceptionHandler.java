@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
@@ -53,6 +54,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "The resource was modified by someone else. Reload and try again.");
         pd.setTitle("Conflict");
         pd.setProperty("code", "CONCURRENT_MODIFICATION");
+        return pd;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthentication(AuthenticationException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                "Invalid USN or password.");
+        pd.setTitle("Unauthorized");
+        pd.setProperty("code", "BAD_CREDENTIALS");
         return pd;
     }
 
